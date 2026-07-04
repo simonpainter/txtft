@@ -1,0 +1,19 @@
+[project]
+name = "txtfs"
+version = "0.1.0"
+description = "DNS TXT record file transfer utility"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = ["dnspython>=2.6"]
+
+[project.scripts]
+txtfs-encode = "txtfs.encode:main"
+txtfs-serve = "txtfs.serve:main"
+txtfs-fetch = "txtfs.fetch:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["txtfs"]

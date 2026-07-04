@@ -16,7 +16,7 @@ import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
 
-from .common import (
+from common import (
     MODES,
     TXT_RECORD_CEILING,
     KeyGenerator,

@@ -23,7 +23,7 @@ import dns.query
 import dns.rcode
 import dns.rdatatype
 
-from .common import join_txt_strings
+from common import join_txt_strings
 
 
 class FetchError(SystemExit):

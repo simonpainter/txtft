@@ -7,13 +7,13 @@ requires-python = ">=3.11"
 dependencies = ["dnspython>=2.6"]
 
 [project.scripts]
-txtfs-encode = "txtfs.encode:main"
-txtfs-serve = "txtfs.serve:main"
-txtfs-fetch = "txtfs.fetch:main"
+txtfs-encode = "encode:main"
+txtfs-serve = "serve:main"
+txtfs-fetch = "fetch:main"
 
 [build-system]
 requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["txtfs"]
+py-modules = ["common", "encode", "serve", "fetch"]

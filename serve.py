@@ -27,7 +27,7 @@ import dns.rdtypes.ANY.SOA
 import dns.rdtypes.ANY.TXT
 import dns.rrset
 
-from .common import to_txt_strings
+from common import to_txt_strings
 
 
 class Zone:

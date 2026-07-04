@@ -1,4 +1,4 @@
-"""End-to-end round-trip: encode -> serve (loopback) -> fetch -> byte-compare.
+"""End-to-end round-trip: encode -> serve (transfer) -> fetch/decode.
 
 Exercises segmentation, index chaining, TXT string splitting, TCP framing, and
 reassembly in one pass. Run with ``pytest`` or directly with ``python``.
@@ -32,28 +32,55 @@ def _run_roundtrip(tmp_path: Path, payload_max: str, mode: str, size: int) -> No
     zonefile = tmp_path / "zone.json"
 
     subprocess.run(
-        [sys.executable, "-m", "txtfs.encode", str(src),
-         "--zone", zone, "--out", str(zonefile),
-         "--wordlist", str(ROOT / "wordlist.txt"),
-         "--words", "4", "--payload-max", payload_max],
-        cwd=ROOT, check=True,
+        [
+            sys.executable,
+            "-m",
+            "encode",
+            str(src),
+            "--zone",
+            zone,
+            "--out",
+            str(zonefile),
+            "--wordlist",
+            str(ROOT / "wordlist.txt"),
+            "--words",
+            "4",
+            "--payload-max",
+            payload_max,
+        ],
+        cwd=ROOT,
+        check=True,
     )
     seed = json.loads(zonefile.read_text())["meta"]["seed_key"]
 
     port = free_port()
     server = subprocess.Popen(
-        [sys.executable, "-m", "txtfs.serve", str(zonefile),
-         "--host", "127.0.0.1", "--port", str(port)],
+        [sys.executable, "-m", "serve", str(zonefile), "--host", "127.0.0.1", "--port", str(port)],
         cwd=ROOT,
     )
     try:
         time.sleep(1.5)
         subprocess.run(
-            [sys.executable, "-m", "txtfs.fetch", seed,
-             "--zone", zone, "--server", "127.0.0.1", "--port", str(port),
-             "--mode", mode, "--out", str(tmp_path / "recovered.bin"),
-             "--out-dir", str(tmp_path / "out")],
-            cwd=ROOT, check=True,
+            [
+                sys.executable,
+                "-m",
+                "fetch",
+                seed,
+                "--zone",
+                zone,
+                "--server",
+                "127.0.0.1",
+                "--port",
+                str(port),
+                "--mode",
+                mode,
+                "--out",
+                str(tmp_path / "recovered.bin"),
+                "--out-dir",
+                str(tmp_path / "out"),
+            ],
+            cwd=ROOT,
+            check=True,
         )
     finally:
         server.terminate()
@@ -63,12 +90,12 @@ def _run_roundtrip(tmp_path: Path, payload_max: str, mode: str, size: int) -> No
     assert hashlib.sha256(recovered).hexdigest() == hashlib.sha256(data).hexdigest()
 
 
-def test_direct_multi_segment_multi_index(tmp_path):
+def test_encode_transfer_decode_direct(tmp_path):
     # Small payload_max forces many segments AND a chained index.
     _run_roundtrip(tmp_path, payload_max="4000", mode="direct", size=300_000)
 
 
-def test_compatible_udp(tmp_path):
+def test_encode_transfer_decode_compatible(tmp_path):
     _run_roundtrip(tmp_path, payload_max="1200", mode="compatible", size=120_000)
 
 

@@ -28,22 +28,22 @@ pip install -r requirements.txt          # just dnspython
 pip install -e .
 ```
 
-Python 3.11+. Either invoke as modules (`python -m txtfs.encode ...`) or, after
+Python 3.11+. Either invoke as modules (`python -m encode ...`) or, after
 `pip install -e .`, use the `txtfs-encode` / `txtfs-serve` / `txtfs-fetch` commands.
 
 ## Quick start (loopback)
 
 ```bash
 # 1. Encode a file into a zone store. Prints the seed key you hand to the downloader.
-python -m txtfs.encode ./report.pdf --zone f.example.com --out zone.json
+python -m encode ./report.pdf --zone f.example.com --out zone.json
 #   seed key : delta-walnut-heath
 #   seed FQDN: delta-walnut-heath.f.example.com
 
 # 2. Serve it (high port, no root needed).
-python -m txtfs.serve zone.json --host 127.0.0.1 --port 5300
+python -m serve zone.json --host 127.0.0.1 --port 5300
 
 # 3. In another shell, download by seed key, querying the server directly.
-python -m txtfs.fetch delta-walnut-heath \
+python -m fetch delta-walnut-heath \
     --zone f.example.com --server 127.0.0.1 --port 5300 --out recovered.pdf
 ```
 
@@ -61,8 +61,8 @@ routinely truncate or drop it. Two presets trade record size against resolver re
 Set on **both** encode and fetch:
 
 ```bash
-python -m txtfs.encode data.bin --zone f.example.com --mode compatible --out zone.json
-python -m txtfs.fetch <seed> --zone f.example.com --server <ip> --mode compatible
+python -m encode data.bin --zone f.example.com --mode compatible --out zone.json
+python -m fetch <seed> --zone f.example.com --server <ip> --mode compatible
 ```
 
 Override the exact size with `--payload-max N` (base64 chars per record) on encode.
@@ -73,8 +73,8 @@ Pass several inputs; they're zipped into one archive under a single seed. `--nam
 labels the bundle. The downloader extracts all members to `--out-dir`.
 
 ```bash
-python -m txtfs.encode a.pdf b.csv c.png --zone f.example.com --name bundle --out zone.json
-python -m txtfs.fetch <seed> --zone f.example.com --server <ip> --out-dir ./out
+python -m encode a.pdf b.csv c.png --zone f.example.com --name bundle --out zone.json
+python -m fetch <seed> --zone f.example.com --server <ip> --out-dir ./out
 ```
 
 ## Serving on the real DNS hierarchy
@@ -116,13 +116,13 @@ both `direct` (chained-index) and `compatible` (UDP) configurations.
 
 ```
 txtfs/
-├── txtfs/
-│   ├── common.py   # sizing math, TXT string split/join, key generation, wordlist
-│   ├── encode.py   # txtfs-encode
-│   ├── serve.py    # txtfs-serve (asyncio UDP + TCP)
-│   └── fetch.py    # txtfs-fetch
+├── common.py       # sizing math, TXT string split/join, key generation, wordlist
+├── encode.py       # txtfs-encode
+├── serve.py        # txtfs-serve (asyncio UDP + TCP)
+├── fetch.py        # txtfs-fetch
 ├── wordlist.txt    # ~230 words; use --words 4 or a bigger list for large files
 ├── tests/test_roundtrip.py
+├── .github/workflows/ci.yml
 ├── pyproject.toml
 ├── requirements.txt
 ├── README.md
